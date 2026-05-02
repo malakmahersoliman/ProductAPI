@@ -27,11 +27,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Feature\Product\Commands\CreateProduct\" />
-    <Folder Include="Feature\Product\Commands\DeleteCoffee\" />
-    <Folder Include="Feature\Product\Commands\UpdateProduct\" />
-    <Folder Include="Feature\Product\Queries\GetAllProduct\" />
-    <Folder Include="Feature\Product\Queries\GetProductById\" />
+    <Folder Include="Feature\Customers\Commands\" />
+    <Folder Include="Feature\Customers\Queries\" />
+    <Folder Include="Feature\Orders\Commands\" />
+    <Folder Include="Feature\Orders\Queries\" />
+    <Folder Include="Feature\Products\Commands\CreateProduct\" />
+    <Folder Include="Feature\Products\Commands\DeleteCoffee\" />
+    <Folder Include="Feature\Products\Commands\UpdateProduct\" />
+    <Folder Include="Feature\Products\Queries\GetAllProduct\" />
+    <Folder Include="Feature\Products\Queries\GetProductById\" />
   </ItemGroup>
 
 </Project>
