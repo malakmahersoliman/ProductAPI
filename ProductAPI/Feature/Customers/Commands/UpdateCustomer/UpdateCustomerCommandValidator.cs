@@ -7,22 +7,17 @@ namespace ProductAPI.Feature.Customers.Commands.UpdateCustomer
     {
         public UpdateCustomerCommandValidator()
         {
-            RuleFor(c => c.Id)
-                .GreaterThan(0)
-                .WithMessage("Customer ID must be greater than 0.");
+            RuleFor(x => x.Id)
+                .GreaterThan(0);
 
-            RuleFor(c => c.Dto.Name)
+            RuleFor(x => x.Dto.Name)
                 .NotEmpty()
                 .MaximumLength(200);
 
-            RuleFor(c => c.Dto.Email)
+            RuleFor(x => x.Dto.Email)
                 .NotEmpty()
-                .WithMessage("Email is required.")
                 .EmailAddress()
-                .MaximumLength(200)
-                .WithMessage("Email must be a valid email address and less than 200 characters.");
-
-
+                .MaximumLength(200);
         }
 
     }
