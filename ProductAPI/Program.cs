@@ -1,6 +1,11 @@
 
+using FluentValidation;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
+using ProductAPI.Common.Behaviors;
 using ProductAPI.Data;
+using Microsoft.AspNetCore.Diagnostics;
+
 
 namespace ProductAPI
 {
@@ -26,11 +31,51 @@ namespace ProductAPI
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
             builder.Services.AddMediatR(cfg =>
                                          cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+            builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             builder.Services.AddOpenApi();
 
 
             var app = builder.Build();
+
+            app.UseExceptionHandler(errorApp =>
+            {
+                errorApp.Run(async context =>
+                {
+                    var exceptionHandlerFeature =
+                        context.Features.Get<IExceptionHandlerFeature>();
+
+                    var exception = exceptionHandlerFeature?.Error;
+
+                    if (exception is ValidationException validationException)
+                    {
+                        context.Response.StatusCode = StatusCodes.Status400BadRequest;
+                        context.Response.ContentType = "application/json";
+
+                        var errors = validationException.Errors
+                            .GroupBy(e => e.PropertyName)
+                            .ToDictionary(
+                                group => group.Key,
+                                group => group.Select(e => e.ErrorMessage).ToArray());
+
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            Message = "Validation failed",
+                            Errors = errors
+                        });
+
+                        return;
+                    }
+
+                    context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    await context.Response.WriteAsJsonAsync(new
+                    {
+                        Message = "An unexpected error occurred."
+                    });
+                });
+            });
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
