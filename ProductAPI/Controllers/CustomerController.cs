@@ -2,8 +2,10 @@
 using Microsoft.AspNetCore.Mvc;
 using ProductAPI.DTOs.Customers;
 using ProductAPI.Feature.Customers.Commands.CreateCustomer;
+using ProductAPI.Feature.Customers.Commands.DeleteCustomer;
 using ProductAPI.Feature.Customers.Queries.GetAllCustomers;
 using ProductAPI.Feature.Customers.Queries.GetCustomerById;
+using ProductAPI.Features.Customers.Commands.UpdateCustomer;
 
 
 namespace ProductAPI.Controllers;

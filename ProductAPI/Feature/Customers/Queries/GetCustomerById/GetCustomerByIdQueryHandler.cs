@@ -1,4 +1,6 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using ProductAPI.Data;
 using ProductAPI.DTOs.Customers;
 
 namespace ProductAPI.Feature.Customers.Queries.GetCustomerById
