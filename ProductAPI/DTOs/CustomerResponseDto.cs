@@ -1,6 +1,9 @@
-﻿namespace ProductAPI.DTOs
+﻿namespace ProductAPI.DTOs.Customers;
+
+public class CustomerResponseDto
 {
-    public class CustomerResponseDto
-    {
-    }
+    public int Id { get; set; }
+
+    public string Name { get; set; } = "";
+    public string Email { get; set; } = "";
 }

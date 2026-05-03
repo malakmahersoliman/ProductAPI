@@ -2,7 +2,7 @@
 
 namespace ProductAPI.DTOs.Customers;
 
-public class CreateCustomerDto
+public class UpdateCustomerDto
 {
     [Required]
     [MaxLength(200)]

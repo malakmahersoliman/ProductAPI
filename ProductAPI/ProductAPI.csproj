@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
@@ -27,15 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Feature\Customers\Commands\" />
-    <Folder Include="Feature\Customers\Queries\" />
-    <Folder Include="Feature\Orders\Commands\" />
-    <Folder Include="Feature\Orders\Queries\" />
-    <Folder Include="Feature\Products\Commands\CreateProduct\" />
-    <Folder Include="Feature\Products\Commands\DeleteCoffee\" />
-    <Folder Include="Feature\Products\Commands\UpdateProduct\" />
-    <Folder Include="Feature\Products\Queries\GetAllProduct\" />
-    <Folder Include="Feature\Products\Queries\GetProductById\" />
+    <Folder Include="Feature\Customers\Commands\CreateCustomer\" />
+    <Folder Include="Feature\Customers\Commands\DeleteCustomer\" />
+    <Folder Include="Feature\Customers\Commands\UpdateCustomer\" />
+    <Folder Include="Feature\Customers\Queries\GetAllCustomers\" />
+    <Folder Include="Feature\Customers\Queries\GetCustomerById\" />
   </ItemGroup>
 
 </Project>

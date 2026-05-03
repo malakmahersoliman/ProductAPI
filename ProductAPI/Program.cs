@@ -24,6 +24,8 @@ namespace ProductAPI
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            builder.Services.AddMediatR(cfg =>
+                                         cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
 
             builder.Services.AddOpenApi();
 

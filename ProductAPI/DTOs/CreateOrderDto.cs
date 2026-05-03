@@ -1,19 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ProductAPI.DTOs
+namespace ProductAPI.DTOs.Orders;
+
+public class CreateOrderDto
 {
-    public class CreateOrderDto
-    {
-        public DateTime OrderDate { get; set; }
+    [Required]
+    public int CustomerId { get; set; }
 
-        [Required]
-
-        public string Status { get; set; } = "";
-
-
-        public int TotalAmount { get; set; }
-
-        public int CustomerId { get; set; }
-        public IEnumerable<CreateOrderItemDto> Items { get;  set; } = new List<CreateOrderItemDto>();
-    }
+    [Required]
+    [MinLength(1)]
+    public List<CreateOrderItemDto> Items { get; set; } = new();
 }
