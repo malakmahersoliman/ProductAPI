@@ -6,7 +6,6 @@ using ProductAPI.Feature.Products.Commands.CreateProduct;
 using ProductAPI.Feature.Products.Commands.DeleteProduct;
 using ProductAPI.Feature.Products.Commands.UpdateProduct;
 using ProductAPI.Feature.Products.Queries.GetAllProducts;
-
 using ProductAPI.Features.Products.Queries.GetProductById;
 
 namespace ProductAPI.Controllers;

@@ -17,9 +17,7 @@ public class UpdateOrderStatusCommandHandler
         UpdateOrderStatusCommand request,
         CancellationToken cancellationToken)
     {
-        var order = await _context.Orders.FindAsync(
-            new object[] { request.Id },
-            cancellationToken);
+        var order = await _context.Orders.FindAsync(request.Id  );
 
         if (order == null)
             return false;
