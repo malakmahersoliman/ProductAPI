@@ -29,10 +29,12 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
                 CustomerName = o.Customer.Name,
                 Items = o.OrderItems.Select(oi => new OrderItemResponseDto
                 {
+                    Id = oi.Id,
                     ProductId = oi.ProductId,
                     ProductName = oi.Product.Name,
                     Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice
+                    UnitPrice = oi.UnitPrice,
+                    Subtotal = oi.Quantity * oi.UnitPrice
                 }).ToList()
             }).ToListAsync(cancellationToken);
 

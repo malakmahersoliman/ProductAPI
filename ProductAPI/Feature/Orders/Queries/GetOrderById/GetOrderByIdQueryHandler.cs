@@ -17,6 +17,7 @@ namespace ProductAPI.Feature.Orders.Queries.GetOrderById
         public async Task<OrderResponseDto?> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
         {
             return await _context.Orders
+                .Where(o => o.Id == request.Id)
                 .Select(o => new OrderResponseDto
                 {
                     Id = o.Id,

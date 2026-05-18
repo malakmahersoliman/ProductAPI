@@ -36,8 +36,17 @@ namespace ProductAPI
 
             builder.Services.AddOpenApi();
 
-
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAngular", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
             var app = builder.Build();
+
 
             app.UseExceptionHandler(errorApp =>
             {
@@ -90,6 +99,8 @@ namespace ProductAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseCors("AllowAngular");
 
             app.UseAuthorization();
 
