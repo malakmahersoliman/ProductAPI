@@ -1,9 +1,11 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
 
 namespace ProductAPI.Feature.Products.Commands.DeleteProduct
 {
-    public class DeleteProductCommandHandler : IRequestHandler<DeleteProductCommand, bool>
+    public class DeleteProductCommandHandler
+        : IRequestHandler<DeleteProductCommand, DeleteProductResult>
     {
         private readonly AppDbContext _context;
 
@@ -12,17 +14,30 @@ namespace ProductAPI.Feature.Products.Commands.DeleteProduct
             _context = context;
         }
 
-        public async Task<bool> Handle(DeleteProductCommand request, CancellationToken cancellationToken)
+        public async Task<DeleteProductResult> Handle(
+            DeleteProductCommand request,
+            CancellationToken cancellationToken)
         {
-            var product = await _context.Products.FindAsync(request.Id);
+            var product = await _context.Products
+                .FindAsync(new object[] { request.Id }, cancellationToken);
+
             if (product == null)
             {
-                return false;
+                return DeleteProductResult.NotFound;
+            }
+
+            var isUsedInOrders = await _context.OrderItems
+                .AnyAsync(oi => oi.ProductId == request.Id, cancellationToken);
+
+            if (isUsedInOrders)
+            {
+                return DeleteProductResult.Conflict;
             }
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync(cancellationToken);
-            return true;
+
+            return DeleteProductResult.Deleted;
         }
     }
 }

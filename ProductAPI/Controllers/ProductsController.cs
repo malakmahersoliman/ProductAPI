@@ -64,11 +64,16 @@ public class ProductsController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
-        var deleted = await _mediator.Send(new DeleteProductCommand(id));
+        var result = await _mediator.Send(new DeleteProductCommand(id));
 
-        if (!deleted)
-            return NotFound();
-
-        return NoContent();
+        return result switch
+        {
+            DeleteProductResult.NotFound => NotFound(),
+            DeleteProductResult.Conflict => Conflict(
+                "This product cannot be deleted because it is linked to existing orders."
+            ),
+            DeleteProductResult.Deleted => NoContent(),
+            _ => BadRequest()
+        };
     }
 }
