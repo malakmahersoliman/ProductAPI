@@ -5,7 +5,11 @@ using Microsoft.EntityFrameworkCore;
 using ProductAPI.Common.Behaviors;
 using ProductAPI.Data;
 using Microsoft.AspNetCore.Diagnostics;
-
+using ProductAPI.Settings;
+using ProductAPI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace ProductAPI
 {
@@ -45,6 +49,32 @@ namespace ProductAPI
                           .AllowAnyMethod();
                 });
             });
+            builder.Services.Configure<JwtSettings>(
+                         builder.Configuration.GetSection("Jwt"));
+
+            builder.Services.AddScoped<IJwtService, JwtService>();
+            var jwtSection = builder.Configuration.GetSection("Jwt");
+            var jwtSettings = jwtSection.Get<JwtSettings>();
+
+            builder.Services
+                .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+
+                        ValidIssuer = jwtSettings!.Issuer,
+                        ValidAudience = jwtSettings.Audience,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.UTF8.GetBytes(jwtSettings.Key))
+                    };
+                });
+
+            builder.Services.AddAuthorization();
             var app = builder.Build();
 
 
@@ -77,7 +107,22 @@ namespace ProductAPI
                         return;
                     }
 
+                    if (exception is UnauthorizedAccessException)
+                    {
+                        context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                        context.Response.ContentType = "application/json";
+
+                        await context.Response.WriteAsJsonAsync(new
+                        {
+                            Message = exception.Message
+                        });
+
+                        return;
+                    }
+
                     context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                    context.Response.ContentType = "application/json";
+
                     await context.Response.WriteAsJsonAsync(new
                     {
                         Message = "An unexpected error occurred."
@@ -102,8 +147,9 @@ namespace ProductAPI
 
             app.UseCors("AllowAngular");
 
-            app.UseAuthorization();
+            app.UseAuthentication();
 
+            app.UseAuthorization();
 
             app.MapControllers();
 
