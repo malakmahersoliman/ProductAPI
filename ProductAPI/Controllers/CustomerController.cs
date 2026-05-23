@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductAPI.DTOs.Customers;
 using ProductAPI.Feature.Customers.Commands.CreateCustomer;
@@ -10,6 +11,7 @@ using ProductAPI.Features.Customers.Commands.UpdateCustomer;
 
 namespace ProductAPI.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("api/customers")]
 public class CustomersController : ControllerBase

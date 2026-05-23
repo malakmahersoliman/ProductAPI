@@ -1,40 +1,56 @@
 ﻿using MediatR;
+using Microsoft.EntityFrameworkCore;
+using ProductAPI.Data;
 using ProductAPI.DTOs;
 using ProductAPI.Services;
-using UnauthorizedAccessException = System.UnauthorizedAccessException;
 
 namespace ProductAPI.Feature.Auth.Commands.Login
 {
-    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto>
+    public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto?>
     {
+        private readonly AppDbContext _context;
         private readonly IJwtService _jwtService;
+        private readonly IPasswordService _passwordService;
 
-        public LoginCommandHandler(IJwtService jwtService)
+        public LoginCommandHandler(
+            AppDbContext context,
+            IJwtService jwtService,
+            IPasswordService passwordService)
         {
+            _context = context;
             _jwtService = jwtService;
+            _passwordService = passwordService;
         }
 
-        public Task<LoginResponseDto?> Handle(LoginCommand request, CancellationToken cancellationToken)
+        public async Task<LoginResponseDto?> Handle(
+            LoginCommand request,
+            CancellationToken cancellationToken)
         {
-            const string adminEmail = "admin@test.com";
-            const string adminPassword = "123456";
-            const string adminRole = "SuperAdmin";
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == request.Email, cancellationToken);
 
-            if (request.Email != adminEmail || request.Password != adminPassword)
+            if (user is null)
             {
-                return Task.FromResult<LoginResponseDto?>(null);
+                return null;
             }
 
-            var token = _jwtService.GenerateToken(adminEmail, adminRole);
+            var isPasswordValid = _passwordService.VerifyPassword(
+                request.Password,
+                user.PasswordHash);
 
-            var response = new LoginResponseDto
+            if (!isPasswordValid)
+            {
+                return null;
+            }
+
+            var token = _jwtService.GenerateToken(user.Email, user.Role);
+
+            return new LoginResponseDto
             {
                 Token = token,
-                Email = adminEmail,
-                Role = adminRole
+                Email = user.Email,
+                Role = user.Role
             };
-
-            return Task.FromResult<LoginResponseDto?>(response);
         }
     }
 }

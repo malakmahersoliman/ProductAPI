@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductAPI.DTOs.Orders;
 using ProductAPI.Feature.Orders.Commands.CreateOrder;
@@ -10,6 +11,7 @@ using ProductAPI.Features.Orders.Commands.UpdateOrderStatus;
 
 namespace ProductAPI.Controllers;
 
+[Authorize(Roles = "SuperAdmin")]
 [ApiController]
 [Route("api/orders")]
 public class OrdersController : ControllerBase

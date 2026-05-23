@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductAPI.DTOs;
 
@@ -10,6 +11,8 @@ using ProductAPI.Features.Products.Queries.GetProductById;
 
 namespace ProductAPI.Controllers;
 
+
+[Authorize]
 [ApiController]
 [Route("api/products")]
 public class ProductsController : ControllerBase
@@ -38,7 +41,7 @@ public class ProductsController : ControllerBase
 
         return Ok(product);
     }
-
+    [Authorize(Roles = "SuperAdmin")]
     [HttpPost]
     public async Task<IActionResult> Create(CreateProductDto dto)
     {
@@ -49,7 +52,7 @@ public class ProductsController : ControllerBase
             new { id = product.Id },
             product);
     }
-
+    [Authorize(Roles = "SuperAdmin")]
     [HttpPut("{id}")]
     public async Task<IActionResult> Update(int id, UpdateProductDto dto)
     {
@@ -60,7 +63,7 @@ public class ProductsController : ControllerBase
 
         return NoContent();
     }
-
+    [Authorize(Roles = "SuperAdmin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

@@ -1,14 +1,14 @@
-
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi;
 using ProductAPI.Common.Behaviors;
 using ProductAPI.Data;
-using Microsoft.AspNetCore.Diagnostics;
-using ProductAPI.Settings;
 using ProductAPI.Services;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
+using ProductAPI.Settings;
 using System.Text;
 
 namespace ProductAPI
@@ -23,9 +23,26 @@ namespace ProductAPI
 
 
             // Add services to the container.
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(options =>
+            {
+                options.SwaggerDoc("v1", new OpenApiInfo
+                {
+                    Title = "Product API",
+                    Version = "v1"
+                });
 
-
+                options.AddSecurityDefinition("bearer", new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    Description = "JWT Authorization header using the Bearer scheme."
+                });
+                options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+                {
+                    [new OpenApiSecuritySchemeReference("bearer", document)] = []
+                });
+            });
 
             builder.Services.AddControllers();
 
@@ -38,7 +55,7 @@ namespace ProductAPI
             builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
-            builder.Services.AddOpenApi();
+
 
             builder.Services.AddCors(options =>
             {
@@ -53,6 +70,7 @@ namespace ProductAPI
                          builder.Configuration.GetSection("Jwt"));
 
             builder.Services.AddScoped<IJwtService, JwtService>();
+            builder.Services.AddScoped<IPasswordService, PasswordService>();
             var jwtSection = builder.Configuration.GetSection("Jwt");
             var jwtSettings = jwtSection.Get<JwtSettings>();
 
@@ -75,8 +93,28 @@ namespace ProductAPI
                 });
 
             builder.Services.AddAuthorization();
-            var app = builder.Build();
 
+            var app = builder.Build();
+            //using (var scope = app.Services.CreateScope())
+            //{
+            //    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            //    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+
+            //    dbContext.Database.Migrate();
+
+            //    if (!dbContext.Users.Any(u => u.Email == "user@test.com"))
+            //    {
+            //        dbContext.Users.Add(new User
+            //        {
+            //            Email = "user@test.com",
+            //            PasswordHash = passwordService.HashPassword("123456"),
+            //            Role = "User",
+            //            CreatedAt = DateTime.UtcNow
+            //        });
+            
+            //    dbContext.SaveChanges();
+            //    }
+            //} //seeding 
 
             app.UseExceptionHandler(errorApp =>
             {
@@ -134,7 +172,6 @@ namespace ProductAPI
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
-                app.MapOpenApi();
                 app.UseSwagger();
                 app.UseSwaggerUI(c =>
                 {
