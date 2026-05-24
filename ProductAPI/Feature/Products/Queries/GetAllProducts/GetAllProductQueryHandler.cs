@@ -1,6 +1,6 @@
 ﻿using MediatR;
 using ProductAPI.Data;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Products;
 using Microsoft.EntityFrameworkCore;
 
 namespace ProductAPI.Feature.Products.Queries.GetAllProducts

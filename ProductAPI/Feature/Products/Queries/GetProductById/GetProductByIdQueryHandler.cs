@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Products;
 
 
 namespace ProductAPI.Features.Products.Queries.GetProductById;

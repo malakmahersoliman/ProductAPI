@@ -5,39 +5,30 @@ using ProductAPI.DTOs.Orders;
 
 namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
 {
-    public class GetAllOrderQueryHandler : IRequestHandler<GetAllOrdersQuery, List<OrderResponseDto>>
+    public class GetAllOrderQueryHandler : IRequestHandler<GetAllOrdersQuery, List<OrderSummaryDto>>
     {
         private readonly AppDbContext _context;
+
         public GetAllOrderQueryHandler(AppDbContext context)
         {
             _context = context;
         }
-        public async Task<List<OrderResponseDto>> 
+
+        public async Task<List<OrderSummaryDto>>
             Handle(GetAllOrdersQuery request, CancellationToken cancellationToken)
         {
             return await _context.Orders
-            .Include(o => o.Customer)
-            .Include(o => o.OrderItems)
-                    .ThenInclude(oi => oi.Product)
-            .Select(o => new OrderResponseDto
-            {
-                Id = o.Id,
-                OrderDate = o.OrderDate,
-                Status = o.Status,
-                TotalAmount = o.TotalAmount,
-                CustomerId = o.CustomerId,
-                CustomerName = o.Customer.Name,
-                Items = o.OrderItems.Select(oi => new OrderItemResponseDto
+                .Select(o => new OrderSummaryDto
                 {
-                    Id = oi.Id,
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice,
-                    Subtotal = oi.Quantity * oi.UnitPrice
-                }).ToList()
-            }).ToListAsync(cancellationToken);
-
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status,
+                    TotalAmount = o.TotalAmount,
+                    CustomerId = o.CustomerId,
+                    CustomerName = o.Customer!.Name,
+                    ItemCount = o.OrderItems.Count,
+                })
+                .ToListAsync(cancellationToken);
         }
     }
 }

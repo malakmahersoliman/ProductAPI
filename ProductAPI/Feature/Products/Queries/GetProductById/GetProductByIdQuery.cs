@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Products;
 
 
 namespace ProductAPI.Features.Products.Queries.GetProductById;

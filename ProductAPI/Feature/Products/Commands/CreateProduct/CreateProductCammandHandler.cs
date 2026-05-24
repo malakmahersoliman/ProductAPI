@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using ProductAPI.Data;
 using ProductAPI.Domain;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Products;
 
 namespace ProductAPI.Feature.Products.Commands.CreateProduct
 {

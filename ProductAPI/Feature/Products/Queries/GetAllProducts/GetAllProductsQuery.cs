@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Products;
 
 namespace ProductAPI.Feature.Products.Queries.GetAllProducts
 {

@@ -1,7 +1,7 @@
 ﻿using MediatR;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Auth;
 
-namespace ProductAPI.Feature.Auth.Commands.Login
+namespace ProductAPI.Feature.Auth.Login.Commands
 {
     public class LoginCommand : IRequest<LoginResponseDto>
     {

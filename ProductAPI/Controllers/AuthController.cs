@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using ProductAPI.DTOs;
-using ProductAPI.Feature.Auth.Commands.Login;
+using ProductAPI.DTOs.Auth;
+using ProductAPI.Feature.Auth.Login.Commands;
 
 namespace ProductAPI.Controllers
 {

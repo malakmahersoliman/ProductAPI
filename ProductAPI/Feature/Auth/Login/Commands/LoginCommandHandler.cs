@@ -1,10 +1,10 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Auth;
 using ProductAPI.Services;
 
-namespace ProductAPI.Feature.Auth.Commands.Login
+namespace ProductAPI.Feature.Auth.Login.Commands
 {
     public class LoginCommandHandler : IRequestHandler<LoginCommand, LoginResponseDto?>
     {

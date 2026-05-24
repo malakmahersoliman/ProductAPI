@@ -11,7 +11,7 @@ using ProductAPI.Features.Orders.Commands.UpdateOrderStatus;
 
 namespace ProductAPI.Controllers;
 
-[Authorize(Roles = "SuperAdmin")]
+[Authorize]
 [ApiController]
 [Route("api/orders")]
 public class OrdersController : ControllerBase
@@ -23,6 +23,7 @@ public class OrdersController : ControllerBase
         _mediator = mediator;
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpGet]
     public async Task<IActionResult> GetAll()
     {
@@ -30,6 +31,7 @@ public class OrdersController : ControllerBase
         return Ok(orders);
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
@@ -55,6 +57,7 @@ public class OrdersController : ControllerBase
             order);
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpPut("{id}/status")]
     public async Task<IActionResult> UpdateStatus(int id, UpdateOrderStatusDto dto)
     {
@@ -66,6 +69,7 @@ public class OrdersController : ControllerBase
         return NoContent();
     }
 
+    [Authorize(Roles = "SuperAdmin")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {

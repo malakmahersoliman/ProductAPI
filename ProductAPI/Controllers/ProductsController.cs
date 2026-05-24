@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProductAPI.DTOs;
+using ProductAPI.DTOs.Products;
 
 using ProductAPI.Feature.Products.Commands.CreateProduct;
 using ProductAPI.Feature.Products.Commands.DeleteProduct;
