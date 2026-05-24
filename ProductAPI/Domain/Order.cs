@@ -12,7 +12,8 @@
      public decimal TotalAmount { get; set; }
 
      public int CustomerId { get; set; }
-      public Customer? Customer { get; set; } = null;
+     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+     public Customer? Customer { get; set; } = null;
       public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

@@ -20,6 +20,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         entity.Property(o => o.TotalAmount)
             .HasColumnType("decimal(18,2)")
             .IsRequired();
+        entity.Property(o => o.CreatedAt)
+                       .HasDefaultValueSql("GETUTCDATE()");
 
         entity.HasOne(o => o.Customer)
             .WithMany(c => c.Orders)
