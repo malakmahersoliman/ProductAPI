@@ -29,7 +29,7 @@ public class ProductsController : ControllerBase
     {
         var products = await _mediator.Send(new GetAllProductsQuery());
         return Ok(products);
-    }
+    } 
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
