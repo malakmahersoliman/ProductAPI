@@ -14,9 +14,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .IsRequired()
             .HasMaxLength(200);
 
-        entity.Property(p => p.Category)
-            .IsRequired()
-            .HasMaxLength(100);
+        entity.HasOne(p => p.Category)
+            .WithMany(c => c.Products)
+            .HasForeignKey(p => p.CategoryId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         entity.Property(p => p.Price)
             .HasColumnType("decimal(18,2)")

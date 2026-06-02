@@ -14,9 +14,8 @@ namespace ProductAPI.Feature.Products.Commands.UpdateProduct
                 .NotEmpty()
                 .MaximumLength(200);
 
-            RuleFor(x => x.Dto.Category)
-                .NotEmpty()
-                .MaximumLength(100);
+            RuleFor(x => x.Dto.CategoryId)
+                .NotEmpty();
 
             RuleFor(x => x.Dto.Price)
                 .GreaterThan(0);

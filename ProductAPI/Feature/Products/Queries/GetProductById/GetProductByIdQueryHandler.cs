@@ -26,7 +26,8 @@ public class GetProductByIdQueryHandler
             {
                 Id = p.Id,
                 Name = p.Name,
-                Category = p.Category,
+                CategoryId = p.CategoryId,
+                CategoryName = p.Category.Name,
                 Price = p.Price,
                 Stock = p.Stock,
                 IsAvailable = p.IsAvailable

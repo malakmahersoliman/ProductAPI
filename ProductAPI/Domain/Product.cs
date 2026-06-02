@@ -12,14 +12,9 @@ namespace ProductAPI.Domain
         [MaxLength(200)]
         public string Name { get; set; } = "";
 
-        [Required]
-        [MaxLength(100)]
+        public int CategoryId { get; set; }
 
-        public string Category { get; set; } = "";
-
-        //public int? CategoryId { get; set; }
-
-        //public Category? Category { get; set; }
+        public Category Category { get; set; }
 
         [Required]
         [Column(TypeName = "decimal(18, 2)")]
