@@ -24,12 +24,13 @@ public class ProductsController : ControllerBase
         _mediator = mediator;
     }
 
+
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<IActionResult> GetAllProducts([FromQuery] ProductFilterRequestDto filter)
     {
-        var products = await _mediator.Send(new GetAllProductsQuery());
-        return Ok(products);
-    } 
+        var result = await _mediator.Send(new GetAllProductsQuery(filter));
+        return Ok(result);
+    }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
