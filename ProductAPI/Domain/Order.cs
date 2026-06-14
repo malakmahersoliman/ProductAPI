@@ -14,6 +14,9 @@
      public int CustomerId { get; set; }
      public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
      public Customer? Customer { get; set; } = null;
-      public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+
+     public string PaymentStatus { get; set; } = "Unpaid";
+     public ICollection<Payment> Payments { get; set; } = new List<Payment>();
+        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

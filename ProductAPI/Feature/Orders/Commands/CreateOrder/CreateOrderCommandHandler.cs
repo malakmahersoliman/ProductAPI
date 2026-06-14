@@ -27,65 +27,143 @@ public class CreateOrderCommandHandler
             .AnyAsync(c => c.Id == dto.CustomerId, cancellationToken);
 
         if (!customerExists)
+        {
             return null;
+        }
 
-        var productIds = dto.Items.Select(i => i.ProductId).ToList();
+        var groupedItems = dto.Items
+            .GroupBy(i => i.ProductId)
+            .Select(g => new
+            {
+                ProductId = g.Key,
+                Quantity = g.Sum(x => x.Quantity)
+            })
+            .ToList();
+
+        if (groupedItems.Any(i => i.Quantity <= 0))
+        {
+            throw new InvalidOperationException("Quantity must be greater than zero.");
+        }
+
+        var productIds = groupedItems
+            .Select(i => i.ProductId)
+            .ToList();
 
         var products = await _context.Products
             .Where(p => productIds.Contains(p.Id))
             .ToListAsync(cancellationToken);
 
-        if (products.Count != productIds.Distinct().Count())
-            return null;
-
-        var order = new Order
+        if (products.Count != productIds.Count)
         {
-            CustomerId = dto.CustomerId,
-            OrderDate = DateTime.UtcNow,
-            Status = "Pending"
-        };
+            return null;
+        }
 
-        foreach (var item in dto.Items)
+        foreach (var item in groupedItems)
         {
             var product = products.First(p => p.Id == item.ProductId);
 
-            order.OrderItems.Add(new OrderItem
+            if (!product.IsAvailable)
             {
-                ProductId = product.Id,
-                Quantity = item.Quantity,
-                UnitPrice = product.Price
-            });
+                throw new InvalidOperationException($"{product.Name} is not available.");
+            }
+
+            if (product.Stock < item.Quantity)
+            {
+                throw new InvalidOperationException(
+                    $"Insufficient stock for {product.Name}. Available stock: {product.Stock}."
+                );
+            }
         }
 
-        order.TotalAmount = order.OrderItems
-            .Sum(oi => oi.Quantity * oi.UnitPrice);
+        var totalAmount = groupedItems.Sum(item =>
+        {
+            var product = products.First(p => p.Id == item.ProductId);
+            return product.Price * item.Quantity;
+        });
 
-        _context.Orders.Add(order);
-        await _context.SaveChangesAsync(cancellationToken);
+        if (!dto.PaymentShouldSucceed)
+        {
+            var reason = string.IsNullOrWhiteSpace(dto.PaymentFailureReason)
+                ? "Payment failed. Please try another payment method."
+                : dto.PaymentFailureReason;
 
-        return await _context.Orders
-            .Include(o => o.Customer)
-            .Include(o => o.OrderItems)
-                .ThenInclude(oi => oi.Product)
-            .Where(o => o.Id == order.Id)
-            .Select(o => new OrderResponseDto
+            throw new InvalidOperationException(reason);
+        }
+
+        await using var transaction = await _context.Database
+            .BeginTransactionAsync(cancellationToken);
+
+        try
+        {
+            var order = new Order
             {
-                Id = o.Id,
-                OrderDate = o.OrderDate,
-                Status = o.Status,
-                TotalAmount = o.TotalAmount,
-                CustomerId = o.CustomerId,
-                CustomerName = o.Customer.Name,
-                Items = o.OrderItems.Select(oi => new OrderItemResponseDto
+                CustomerId = dto.CustomerId,
+                OrderDate = DateTime.UtcNow,
+                Status = "Pending",
+                PaymentStatus = "Paid",
+                TotalAmount = totalAmount
+            };
+
+            foreach (var item in groupedItems)
+            {
+                var product = products.First(p => p.Id == item.ProductId);
+
+                order.OrderItems.Add(new OrderItem
                 {
-                    Id = oi.Id,
-                    ProductId = oi.ProductId,
-                    ProductName = oi.Product.Name,
-                    Quantity = oi.Quantity,
-                    UnitPrice = oi.UnitPrice,
-                    Subtotal = oi.Quantity * oi.UnitPrice
-                }).ToList()
-            })
-            .FirstOrDefaultAsync(cancellationToken);
+                    ProductId = product.Id,
+                    Quantity = item.Quantity,
+                    UnitPrice = product.Price
+                });
+
+                product.Stock -= item.Quantity;
+            }
+
+            var payment = new Payment
+            {
+                Order = order,
+                Amount = totalAmount,
+                Currency = "EGP",
+                Method = dto.PaymentMethod,
+                Status = "Succeeded",
+                Provider = "Manual",
+                CreatedAt = DateTime.UtcNow,
+                CompletedAt = DateTime.UtcNow
+            };
+
+            _context.Orders.Add(order);
+            _context.Payments.Add(payment);
+
+            await _context.SaveChangesAsync(cancellationToken);
+            await transaction.CommitAsync(cancellationToken);
+
+            return await _context.Orders
+                .AsNoTracking()
+                .Where(o => o.Id == order.Id)
+                .Select(o => new OrderResponseDto
+                {
+                    Id = o.Id,
+                    OrderDate = o.OrderDate,
+                    Status = o.Status,
+                    PaymentStatus = o.PaymentStatus,
+                    TotalAmount = o.TotalAmount,
+                    CustomerId = o.CustomerId,
+                    CustomerName = o.Customer.Name,
+                    Items = o.OrderItems.Select(oi => new OrderItemResponseDto
+                    {
+                        Id = oi.Id,
+                        ProductId = oi.ProductId,
+                        ProductName = oi.Product.Name,
+                        Quantity = oi.Quantity,
+                        UnitPrice = oi.UnitPrice,
+                        Subtotal = oi.Quantity * oi.UnitPrice
+                    }).ToList()
+                })
+                .FirstOrDefaultAsync(cancellationToken);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(cancellationToken);
+            throw;
+        }
     }
 }

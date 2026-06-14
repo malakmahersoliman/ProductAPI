@@ -8,5 +8,9 @@ public class OrderResponseDto
     public decimal TotalAmount { get; set; }
     public int CustomerId { get; set; }
     public string CustomerName { get; set; } = "";
+
+    public string PaymentStatus { get; set; } = string.Empty;
+
+    public string? PaymentMethod { get; set; }
     public List<OrderItemResponseDto> Items { get; set; } = new();
 }

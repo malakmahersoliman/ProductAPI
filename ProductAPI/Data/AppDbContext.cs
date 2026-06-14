@@ -19,6 +19,8 @@ public class AppDbContext : DbContext
 
     public DbSet<Category> Categories => Set<Category>();
 
+    public DbSet<Payment> Payments => Set<Payment>();
+
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

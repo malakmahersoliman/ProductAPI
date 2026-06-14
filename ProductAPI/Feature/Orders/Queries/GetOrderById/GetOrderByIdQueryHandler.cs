@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
 using ProductAPI.DTOs.Orders;
 
+
 namespace ProductAPI.Feature.Orders.Queries.GetOrderById
 {
     public class GetOrderByIdQueryHandler : IRequestHandler<GetOrderByIdQuery, OrderResponseDto?>
@@ -26,6 +27,7 @@ namespace ProductAPI.Feature.Orders.Queries.GetOrderById
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,
                     CustomerName = o.Customer.Name,
+                    PaymentStatus=o.PaymentStatus,
                     Items = o.OrderItems.Select(oi => new OrderItemResponseDto
                     {
                         Id = oi.Id,

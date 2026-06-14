@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using ProductAPI.DTOs.Common;
 using ProductAPI.DTOs.Orders;
 using ProductAPI.Feature.Orders.Commands.CreateOrder;
 using ProductAPI.Feature.Orders.Queries.GetAllOrders;
@@ -25,10 +26,11 @@ public class OrdersController : ControllerBase
 
     [Authorize(Roles = "SuperAdmin")]
     [HttpGet]
-    public async Task<IActionResult> GetAll()
+    public async Task<ActionResult<PagedResultDto<OrderSummaryDto>>> GetOrders(
+    [FromQuery] OrderFilterRequestDto filter)
     {
-        var orders = await _mediator.Send(new GetAllOrdersQuery());
-        return Ok(orders);
+        var result = await _mediator.Send(new GetAllOrdersQuery(filter));
+        return Ok(result);
     }
 
     [Authorize(Roles = "SuperAdmin")]

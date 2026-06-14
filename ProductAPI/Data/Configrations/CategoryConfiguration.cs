@@ -18,6 +18,7 @@ namespace ProductAPI.Data.Configrations
                 .HasMaxLength(500);
             builder.HasIndex(c => c.Name)
                 .IsUnique();
+           
         }
     }
 }

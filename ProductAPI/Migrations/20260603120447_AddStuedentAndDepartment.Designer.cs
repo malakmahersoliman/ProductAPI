@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ProductAPI.Data;
 
@@ -11,9 +12,11 @@ using ProductAPI.Data;
 namespace ProductAPI.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260603120447_AddStuedentAndDepartment")]
+    partial class AddStuedentAndDepartment
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -70,6 +73,24 @@ namespace ProductAPI.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("ProductAPI.Domain.Department", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Departments");
+                });
+
             modelBuilder.Entity("ProductAPI.Domain.Order", b =>
                 {
                     b.Property<int>("Id")
@@ -88,10 +109,6 @@ namespace ProductAPI.Migrations
 
                     b.Property<DateTime>("OrderDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("PaymentStatus")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -137,57 +154,6 @@ namespace ProductAPI.Migrations
                     b.ToTable("OrderItems");
                 });
 
-            modelBuilder.Entity("ProductAPI.Domain.Payment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<decimal>("Amount")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<DateTime?>("CompletedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Currency")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Method")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<int>("OrderId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Provider")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("ProviderPaymentId")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Status")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("OrderId");
-
-                    b.ToTable("Payments", (string)null);
-                });
-
             modelBuilder.Entity("ProductAPI.Domain.Product", b =>
                 {
                     b.Property<int>("Id")
@@ -220,6 +186,34 @@ namespace ProductAPI.Migrations
                     b.HasIndex("CategoryId");
 
                     b.ToTable("Products");
+                });
+
+            modelBuilder.Entity("ProductAPI.Domain.Student", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DepartmentId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("Navname")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DepartmentId");
+
+                    b.ToTable("Students");
                 });
 
             modelBuilder.Entity("ProductAPI.Domain.User", b =>
@@ -285,17 +279,6 @@ namespace ProductAPI.Migrations
                     b.Navigation("Product");
                 });
 
-            modelBuilder.Entity("ProductAPI.Domain.Payment", b =>
-                {
-                    b.HasOne("ProductAPI.Domain.Order", "Order")
-                        .WithMany("Payments")
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Order");
-                });
-
             modelBuilder.Entity("ProductAPI.Domain.Product", b =>
                 {
                     b.HasOne("ProductAPI.Domain.Category", "Category")
@@ -305,6 +288,17 @@ namespace ProductAPI.Migrations
                         .IsRequired();
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("ProductAPI.Domain.Student", b =>
+                {
+                    b.HasOne("ProductAPI.Domain.Department", "Department")
+                        .WithMany("Students")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Department");
                 });
 
             modelBuilder.Entity("ProductAPI.Domain.Category", b =>
@@ -317,11 +311,14 @@ namespace ProductAPI.Migrations
                     b.Navigation("Orders");
                 });
 
+            modelBuilder.Entity("ProductAPI.Domain.Department", b =>
+                {
+                    b.Navigation("Students");
+                });
+
             modelBuilder.Entity("ProductAPI.Domain.Order", b =>
                 {
                     b.Navigation("OrderItems");
-
-                    b.Navigation("Payments");
                 });
 
             modelBuilder.Entity("ProductAPI.Domain.Product", b =>

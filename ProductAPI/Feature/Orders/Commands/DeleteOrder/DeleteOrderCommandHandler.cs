@@ -25,6 +25,7 @@ public class DeleteOrderCommandHandler
             return false;
 
         _context.Orders.Remove(order);
+        //to-do: not handled to send error when deleting customer how has order
         await _context.SaveChangesAsync(cancellationToken);
 
         return true;
