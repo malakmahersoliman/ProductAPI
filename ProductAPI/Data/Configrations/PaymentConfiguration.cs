@@ -26,6 +26,7 @@ namespace ProductAPI.Data.Configrations
 
             builder.Property(p => p.Status)
                 .IsRequired()
+                .HasConversion<string>()
                 .HasMaxLength(50);
 
             builder.Property(p => p.Provider)

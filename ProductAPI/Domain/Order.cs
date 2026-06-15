@@ -6,7 +6,7 @@
 
      public DateTime OrderDate { get; set; }
 
-     public string Status { get; set; } = "";
+     public OrderStatus Status { get; set; } //change to enum 
      
 
      public decimal TotalAmount { get; set; }
@@ -17,6 +17,6 @@
 
      public string PaymentStatus { get; set; } = "Unpaid";
      public ICollection<Payment> Payments { get; set; } = new List<Payment>();
-        public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+     public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }
 }

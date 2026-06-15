@@ -28,19 +28,18 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
 
             if (!string.IsNullOrWhiteSpace(filter.Search))
             {
-                query = query.Where(o =>
-                    o.Customer!.Name.Contains(filter.Search) ||
-                    o.Id.ToString().Contains(filter.Search));
+                query = query.Where(o => o.Id.ToString().Contains(filter.Search));
             }
 
-            if (filter.CustomerId.HasValue)
+            if (!string.IsNullOrWhiteSpace(filter.CustomerName))
             {
-                query = query.Where(o => o.CustomerId == filter.CustomerId.Value);
+                var customerName = filter.CustomerName.Trim().ToLower();
+                query = query.Where(o => o.Customer!.Name.ToLower() == customerName);
             }
 
             if (!string.IsNullOrWhiteSpace(filter.Status))
             {
-                query = query.Where(o => o.Status == filter.Status);
+                query = query.Where(o => o.Status.ToString() == filter.Status); //check if this is correct
             }
 
             if (!string.IsNullOrWhiteSpace(filter.PaymentStatus))
@@ -62,7 +61,7 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
-                    Status = o.Status,
+                    Status = o.Status.ToString(),
                     PaymentStatus = o.PaymentStatus,
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,

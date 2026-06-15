@@ -7,7 +7,7 @@ namespace ProductAPI.DTOs.Orders
         public string? Status { get; set; }
         public string? PaymentStatus { get; set; }
 
-        public int? CustomerId { get; set; }
+        public string? CustomerName { get; set; }
 
         public decimal? MinTotalAmount { get; set; }
         public decimal? MaxTotalAmount { get; set; }

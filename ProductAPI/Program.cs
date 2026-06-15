@@ -10,6 +10,7 @@ using ProductAPI.Data;
 using ProductAPI.Services;
 using ProductAPI.Settings;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace ProductAPI
 {
@@ -54,6 +55,13 @@ namespace ProductAPI
                                          cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
             builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+
+
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+                });
 
 
 

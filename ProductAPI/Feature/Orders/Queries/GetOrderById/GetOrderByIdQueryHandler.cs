@@ -23,7 +23,7 @@ namespace ProductAPI.Feature.Orders.Queries.GetOrderById
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
-                    Status = o.Status,
+                    Status = o.Status.ToString(),
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,
                     CustomerName = o.Customer.Name,

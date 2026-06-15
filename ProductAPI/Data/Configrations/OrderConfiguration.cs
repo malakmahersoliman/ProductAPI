@@ -15,7 +15,8 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         entity.Property(o => o.Status)
             .IsRequired()
-            .HasMaxLength(50);
+            .HasConversion<string>()
+            .HasMaxLength(20);
 
         entity.Property(o => o.TotalAmount)
             .HasColumnType("decimal(18,2)")

@@ -99,8 +99,8 @@ public class CreateOrderCommandHandler
             {
                 CustomerId = dto.CustomerId,
                 OrderDate = DateTime.UtcNow,
-                Status = "Pending",
-                PaymentStatus = "Paid",
+                Status = OrderStatus.Pending,
+                PaymentStatus = PaymentStatus.Unpaid.ToString(),
                 TotalAmount = totalAmount
             };
 
@@ -124,7 +124,7 @@ public class CreateOrderCommandHandler
                 Amount = totalAmount,
                 Currency = "EGP",
                 Method = dto.PaymentMethod,
-                Status = "Succeeded",
+                Status = PaymentStatus.Unpaid,
                 Provider = "Manual",
                 CreatedAt = DateTime.UtcNow,
                 CompletedAt = DateTime.UtcNow
@@ -143,7 +143,7 @@ public class CreateOrderCommandHandler
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
-                    Status = o.Status,
+                    Status = o.Status.ToString(),
                     PaymentStatus = o.PaymentStatus,
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,

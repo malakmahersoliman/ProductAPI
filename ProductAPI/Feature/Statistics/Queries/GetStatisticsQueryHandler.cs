@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
+using ProductAPI.Domain;
 using ProductAPI.DTOs.Statistics;
 
 namespace ProductAPI.Feature.Statistics.Queries
@@ -53,17 +54,17 @@ namespace ProductAPI.Feature.Statistics.Queries
                     .CountAsync(cancellationToken),
 
                 Pending = await _context.Orders
-                    .CountAsync(o => o.Status == "Pending", cancellationToken),
+                    .CountAsync(o => o.Status == OrderStatus.Pending, cancellationToken),
 
                 Completed = await _context.Orders
-                    .CountAsync(o => o.Status == "Completed", cancellationToken),
+                    .CountAsync(o => o.Status == OrderStatus.Completed, cancellationToken),
 
                 Cancelled = await _context.Orders
-                    .CountAsync(o => o.Status == "Cancelled", cancellationToken),
+                    .CountAsync(o => o.Status == OrderStatus.Cancelled, cancellationToken),
 
                 TodaySales = await _context.Orders
                     .Where(o =>
-                        o.Status == "Completed" &&
+                        o.Status == OrderStatus.Completed &&
                         o.CreatedAt >= todayStart &&
                         o.CreatedAt < tomorrowStart)
                     .SumAsync(o => o.TotalAmount, cancellationToken)
