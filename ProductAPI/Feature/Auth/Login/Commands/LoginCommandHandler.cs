@@ -43,13 +43,13 @@ namespace ProductAPI.Feature.Auth.Login.Commands
                 return null;
             }
 
-            var token = _jwtService.GenerateToken(user.Email, user.Role);
+            var token = _jwtService.GenerateToken(user.Id, user.Email, user.Role.ToString());
 
             return new LoginResponseDto
             {
                 Token = token,
                 Email = user.Email,
-                Role = user.Role
+                Role = user.Role.ToString()
             };
         }
     }

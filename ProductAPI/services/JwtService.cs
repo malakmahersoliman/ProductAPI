@@ -18,10 +18,12 @@ namespace ProductAPI.Services
             _jwtSettings = jwtOptions.Value;
         }
 
-        public string GenerateToken(string email, string role)
+        public string GenerateToken(int userId, string email, string role)
         {
             var claims = new List<Claim>
             {
+                new Claim(ClaimTypes.NameIdentifier, userId.ToString()),
+                new Claim("UserId", userId.ToString()),
                 new Claim(ClaimTypes.Email, email),
                 new Claim(ClaimTypes.Role, role)
             };

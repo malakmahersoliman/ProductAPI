@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using ProductAPI.Common.Behaviors;
 using ProductAPI.Data;
+using ProductAPI.services;
 using ProductAPI.Services;
 using ProductAPI.Settings;
 using System.Text;
@@ -101,6 +102,9 @@ namespace ProductAPI
                 });
 
             builder.Services.AddAuthorization();
+            builder.Services.AddHttpContextAccessor();
+
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             var app = builder.Build();
             //using (var scope = app.Services.CreateScope())

@@ -27,7 +27,7 @@ namespace ProductAPI.Feature.Orders.Queries.GetOrderById
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,
                     CustomerName = o.Customer.Name,
-                    PaymentStatus=o.PaymentStatus,
+                    PaymentStatus=o.PaymentStatus.ToString(),
                     Items = o.OrderItems.Select(oi => new OrderItemResponseDto
                     {
                         Id = oi.Id,

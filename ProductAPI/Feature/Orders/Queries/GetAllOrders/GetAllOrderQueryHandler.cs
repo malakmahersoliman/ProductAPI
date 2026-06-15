@@ -1,8 +1,12 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
+using ProductAPI.Domain;
 using ProductAPI.DTOs.Common;
 using ProductAPI.DTOs.Orders;
+using ProductAPI.services;
+
+
 
 namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
 {
@@ -10,10 +14,15 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
         : IRequestHandler<GetAllOrdersQuery, PagedResultDto<OrderSummaryDto>>
     {
         private readonly AppDbContext _context;
+        private readonly ICurrentUserService _currentUser;
 
-        public GetAllOrderQueryHandler(AppDbContext context)
+        public GetAllOrderQueryHandler(
+            AppDbContext context,
+            ICurrentUserService currentUser
+            )
         {
             _context = context;
+            _currentUser = currentUser;
         }
 
         public async Task<PagedResultDto<OrderSummaryDto>> Handle(
@@ -25,6 +34,11 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
             var query = _context.Orders
                 .AsNoTracking()
                 .AsQueryable();
+
+            if (!_currentUser.IsSuperAdmin)
+            {
+                query = query.Where(o => o.CreatedById == _currentUser.UserId);
+            }
 
             if (!string.IsNullOrWhiteSpace(filter.Search))
             {
@@ -39,12 +53,15 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
 
             if (!string.IsNullOrWhiteSpace(filter.Status))
             {
-                query = query.Where(o => o.Status.ToString() == filter.Status); //check if this is correct
+                if (Enum.TryParse<OrderStatus>(filter.Status, true, out var status))
+                {
+                    query = query.Where(o => o.Status == status);
+                }
             }
 
             if (!string.IsNullOrWhiteSpace(filter.PaymentStatus))
             {
-                query = query.Where(o => o.PaymentStatus == filter.PaymentStatus);
+                query = query.Where(o => o.PaymentStatus.ToString() == filter.PaymentStatus);
             }
 
             var totalCount = await query.CountAsync(cancellationToken);
@@ -54,15 +71,18 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
                 .OrderByDescending(o => o.OrderDate)
                 .ThenByDescending(o => o.Id);
 
+            var pageNumber = filter.PageNumber <= 0 ? 1 : filter.PageNumber;
+            var pageSize = filter.PageSize <= 0 ? 10 : filter.PageSize;
+
             var items = await query
-                .Skip((filter.PageNumber - 1) * filter.PageSize)
-                .Take(filter.PageSize)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
                 .Select(o => new OrderSummaryDto
                 {
                     Id = o.Id,
                     OrderDate = o.OrderDate,
                     Status = o.Status.ToString(),
-                    PaymentStatus = o.PaymentStatus,
+                    PaymentStatus = o.PaymentStatus.ToString(),
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,
                     CustomerName = o.Customer!.Name,
@@ -83,10 +103,9 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
             return new PagedResultDto<OrderSummaryDto>
             {
                 Items = items,
-                PageNumber = filter.PageNumber,
-                PageSize = filter.PageSize,
-                TotalCount = totalCount,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)filter.PageSize)
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
             };
         }
     }

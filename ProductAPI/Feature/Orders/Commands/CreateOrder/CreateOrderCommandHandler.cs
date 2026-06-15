@@ -4,6 +4,7 @@ using ProductAPI.Data;
 using ProductAPI.Domain;
 using ProductAPI.DTOs.Orders;
 using ProductAPI.Feature.Orders.Commands.CreateOrder;
+using ProductAPI.services;
 
 namespace ProductAPI.Features.Orders.Commands.CreateOrder;
 
@@ -11,10 +12,15 @@ public class CreateOrderCommandHandler
     : IRequestHandler<CreateOrderCommand, OrderResponseDto?>
 {
     private readonly AppDbContext _context;
+    private readonly ICurrentUserService _currentUser;
 
-    public CreateOrderCommandHandler(AppDbContext context)
+    public CreateOrderCommandHandler(
+            AppDbContext context,
+          ICurrentUserService currentUser)
     {
         _context = context;
+        _currentUser = currentUser;
+
     }
 
     public async Task<OrderResponseDto?> Handle(
@@ -100,9 +106,12 @@ public class CreateOrderCommandHandler
                 CustomerId = dto.CustomerId,
                 OrderDate = DateTime.UtcNow,
                 Status = OrderStatus.Pending,
-                PaymentStatus = PaymentStatus.Unpaid.ToString(),
+                PaymentStatus = PaymentStatus.Unpaid,
+                CreatedAt=DateTime.UtcNow,
+                CreatedById=_currentUser.UserId,
                 TotalAmount = totalAmount
             };
+
 
             foreach (var item in groupedItems)
             {
@@ -144,10 +153,12 @@ public class CreateOrderCommandHandler
                     Id = o.Id,
                     OrderDate = o.OrderDate,
                     Status = o.Status.ToString(),
-                    PaymentStatus = o.PaymentStatus,
+                    PaymentStatus = o.PaymentStatus.ToString(),
                     TotalAmount = o.TotalAmount,
                     CustomerId = o.CustomerId,
                     CustomerName = o.Customer.Name,
+                    CreatedById = o.CreatedById,
+                    CreatedByEmail = o.CreatedBy!.Email,
                     Items = o.OrderItems.Select(oi => new OrderItemResponseDto
                     {
                         Id = oi.Id,

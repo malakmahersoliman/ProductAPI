@@ -13,4 +13,6 @@ public class OrderResponseDto
 
     public string? PaymentMethod { get; set; }
     public List<OrderItemResponseDto> Items { get; set; } = new();
+    public string CreatedByEmail { get; set; } = string.Empty;
+    public int CreatedById { get;  set; }
 }

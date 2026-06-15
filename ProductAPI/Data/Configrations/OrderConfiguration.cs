@@ -24,6 +24,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         entity.Property(o => o.CreatedAt)
                        .HasDefaultValueSql("GETUTCDATE()");
 
+        entity.Property(o => o.PaymentStatus)
+            .IsRequired()
+            .HasConversion<string>()
+            .HasMaxLength(20);
+
         entity.HasOne(o => o.Customer)
             .WithMany(c => c.Orders)
             .HasForeignKey(o => o.CustomerId)
@@ -33,5 +38,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .WithOne(oi => oi.Order)
             .HasForeignKey(oi => oi.OrderId)
             .OnDelete(DeleteBehavior.Cascade);
+        entity.HasOne(o => o.CreatedBy)
+            .WithMany(u => u.Orders)
+            .HasForeignKey(o => o.CreatedById)
+            .OnDelete(DeleteBehavior.Restrict);
+
     }
 }

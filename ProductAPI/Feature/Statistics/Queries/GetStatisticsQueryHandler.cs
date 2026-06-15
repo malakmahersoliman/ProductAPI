@@ -82,10 +82,10 @@ namespace ProductAPI.Feature.Statistics.Queries
                     .CountAsync(cancellationToken),
 
                 SuperAdmins = await _context.Users
-                    .CountAsync(u => u.Role == "SuperAdmin", cancellationToken),
+                    .CountAsync(u => u.Role == UserRole.SuperAdmin, cancellationToken),
 
                 RegularUsers = await _context.Users
-                    .CountAsync(u => u.Role != "SuperAdmin", cancellationToken)
+                    .CountAsync(u => u.Role != UserRole.SuperAdmin, cancellationToken)
             };
 
             return new StatisticsDto

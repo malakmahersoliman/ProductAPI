@@ -24,7 +24,7 @@ public class OrdersController : ControllerBase
         _mediator = mediator;
     }
 
-    [Authorize(Roles = "SuperAdmin")]
+  
     [HttpGet]
     public async Task<ActionResult<PagedResultDto<OrderSummaryDto>>> GetOrders(
     [FromQuery] OrderFilterRequestDto filter)

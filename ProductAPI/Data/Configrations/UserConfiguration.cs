@@ -25,10 +25,16 @@ namespace ProductAPI.Data.Configurations
 
             builder.Property(u => u.Role)
                 .IsRequired()
+                .HasConversion<string>()
                 .HasMaxLength(50);
 
             builder.Property(u => u.CreatedAt)
                 .IsRequired();
+            builder.HasMany(u => u.Orders)
+                .WithOne(o => o.CreatedBy)
+                .HasForeignKey(o => o.CreatedById)
+                .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }
