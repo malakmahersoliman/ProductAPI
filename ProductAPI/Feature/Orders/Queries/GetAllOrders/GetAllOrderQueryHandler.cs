@@ -31,13 +31,15 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
         {
             var filter = request.Filter;
 
+            var currentUser = _currentUser.GetCurrentUser();
+
             var query = _context.Orders
                 .AsNoTracking()
                 .AsQueryable();
 
-            if (!_currentUser.IsSuperAdmin)
+            if (!currentUser.IsSuperAdmin)
             {
-                query = query.Where(o => o.CreatedById == _currentUser.UserId);
+                query = query.Where(o => o.CreatedById == currentUser.UserId);
             }
 
             if (!string.IsNullOrWhiteSpace(filter.Search))
@@ -105,6 +107,7 @@ namespace ProductAPI.Feature.Orders.Queries.GetAllOrders
                 Items = items,
                 PageNumber = pageNumber,
                 PageSize = pageSize,
+                TotalCount= totalCount,
                 TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
             };
         }

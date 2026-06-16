@@ -1,10 +1,14 @@
-﻿namespace ProductAPI.services
+﻿using ProductAPI.Common.Secuirty;
+
+namespace ProductAPI.services
 {
+    //create an interface to get the current user information from the HttpContext not
+    ///implementing a database call to get the user information from the database
+    ///in the services
     public interface ICurrentUserService
     {
-        int UserId { get; }
-        string Email { get; }
-        string Role { get; }
-        bool IsSuperAdmin { get; }
+
+        CurrentUser GetCurrentUser();
+
     }
 }

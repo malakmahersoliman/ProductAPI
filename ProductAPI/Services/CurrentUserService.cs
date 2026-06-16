@@ -1,10 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using ProductAPI.Common.Secuirty;
 using ProductAPI.services;
 using System.Security.Claims;
 
 namespace ProductAPI.Services
 {
-
     public class CurrentUserService : ICurrentUserService
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -14,38 +13,18 @@ namespace ProductAPI.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public int UserId
+        public CurrentUser GetCurrentUser()
         {
-            get
+            var user = _httpContextAccessor.HttpContext?.User;
+
+            var userIdValue = user?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            return new CurrentUser
             {
-                var userId = _httpContextAccessor.HttpContext?
-                    .User
-                    .FindFirstValue(ClaimTypes.NameIdentifier);
-
-                return int.TryParse(userId, out var id) ? id : 0;
-            }
+                UserId = int.TryParse(userIdValue, out var userId) ? userId : 0,
+                Email = user?.FindFirstValue(ClaimTypes.Email) ?? string.Empty,
+                Role = user?.FindFirstValue(ClaimTypes.Role) ?? string.Empty
+            };
         }
-
-        public string Email
-        {
-            get
-            {
-                return _httpContextAccessor.HttpContext?
-                    .User
-                    .FindFirstValue(ClaimTypes.Email) ?? string.Empty;
-            }
-        }
-
-        public string Role
-        {
-            get
-            {
-                return _httpContextAccessor.HttpContext?
-                    .User
-                    .FindFirstValue(ClaimTypes.Role) ?? string.Empty;
-            }
-        }
-
-        public bool IsSuperAdmin => Role == "SuperAdmin";
     }
 }

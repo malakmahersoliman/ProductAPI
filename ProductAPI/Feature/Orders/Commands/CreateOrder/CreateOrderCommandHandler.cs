@@ -29,6 +29,8 @@ public class CreateOrderCommandHandler
     {
         var dto = request.Dto;
 
+        var currentUser = _currentUser.GetCurrentUser();
+
         var customerExists = await _context.Customers
             .AnyAsync(c => c.Id == dto.CustomerId, cancellationToken);
 
@@ -108,7 +110,7 @@ public class CreateOrderCommandHandler
                 Status = OrderStatus.Pending,
                 PaymentStatus = PaymentStatus.Unpaid,
                 CreatedAt=DateTime.UtcNow,
-                CreatedById=_currentUser.UserId,
+                CreatedById=currentUser.UserId,
                 TotalAmount = totalAmount
             };
 
