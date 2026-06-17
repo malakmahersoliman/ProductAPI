@@ -159,15 +159,22 @@ JWT claims include `UserId`, `Email`, and `Role`. Token expiry defaults to 60 mi
 
 ### Configuration
 
-Update the connection string in `ProductAPI/appsettings.json`:
+Secrets are **not** committed to git. Use a local override file:
 
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Data Source=YOUR_SERVER;Initial Catalog=Test;Integrated Security=True;Encrypt=True;TrustServerCertificate=True;"
-}
+```bash
+cd ProductAPI
+copy appsettings.Development.example.json appsettings.Development.json
 ```
 
-JWT settings are also in `appsettings.json` under the `Jwt` section. Change the secret key before any production deployment.
+Edit `appsettings.Development.json` with your SQL Server connection string and a JWT secret key (at least 32 characters).
+
+| File | Committed? | Purpose |
+|------|------------|---------|
+| `appsettings.json` | Yes | Non-secret defaults (empty connection string and JWT key) |
+| `appsettings.Development.example.json` | Yes | Template for local setup |
+| `appsettings.Development.json` | **No** (gitignored) | Your local connection string and JWT key |
+
+In Development, ASP.NET Core loads `appsettings.json` first, then merges `appsettings.Development.json` on top.
 
 ### Database
 
