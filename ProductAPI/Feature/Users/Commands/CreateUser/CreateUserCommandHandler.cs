@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductAPI.Data;
 using ProductAPI.Domain;
 using ProductAPI.DTOs.User;
+using ProductAPI.Services;
 
 namespace ProductAPI.Feature.Users.Commands.CreateUser
 {
@@ -10,10 +11,14 @@ namespace ProductAPI.Feature.Users.Commands.CreateUser
         : IRequestHandler<CreateUserCommand, UserResponseDto>
     {
         private readonly AppDbContext _context;
+        private readonly IPasswordService _passwordService;
 
-        public CreateUserCommandHandler(AppDbContext context)
+        public CreateUserCommandHandler(
+            AppDbContext context,
+            IPasswordService passwordService)
         {
             _context = context;
+            _passwordService = passwordService;
         }
 
         public async Task<UserResponseDto> Handle(
@@ -36,7 +41,7 @@ namespace ProductAPI.Feature.Users.Commands.CreateUser
             var user = new User
             {
                 Email = request.Email,
-                PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+                PasswordHash = _passwordService.HashPassword(request.Password),
                 Role = role,
                 CreatedAt = DateTime.UtcNow
             };
