@@ -107,26 +107,14 @@ namespace ProductAPI
             builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
 
             var app = builder.Build();
-            //using (var scope = app.Services.CreateScope())
-            //{
-            //    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-            //    var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
 
-            //    dbContext.Database.Migrate();
-
-            //    if (!dbContext.Users.Any(u => u.Email == "user@test.com"))
-            //    {
-            //        dbContext.Users.Add(new User
-            //        {
-            //            Email = "user@test.com",
-            //            PasswordHash = passwordService.HashPassword("123456"),
-            //            Role = "User",
-            //            CreatedAt = DateTime.UtcNow
-            //        });
-            
-            //    dbContext.SaveChanges();
-            //    }
-            //} //seeding 
+            if (builder.Configuration.GetValue<bool>("SeedDatabase"))
+            {
+                using var scope = app.Services.CreateScope();
+                var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+                var passwordService = scope.ServiceProvider.GetRequiredService<IPasswordService>();
+                DatabaseSeeder.SeedAsync(dbContext, passwordService).GetAwaiter().GetResult();
+            }
 
             app.UseExceptionHandler(errorApp =>
             {

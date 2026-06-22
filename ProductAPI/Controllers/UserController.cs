@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using ProductAPI.DTOs.User;
 using ProductAPI.Feature.Users.Commands.CreateUser;
+using ProductAPI.Feature.Users.Commands.DeleteUser;
+using ProductAPI.Feature.Users.Commands.UpdateUser;
 using ProductAPI.Feature.Users.Queries.GetAllUsers;
 using ProductAPI.Feature.Users.Queries.GetUserById;
 
@@ -61,6 +63,48 @@ namespace ProductAPI.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(
+            int id,
+            UpdateUserRequestDto request,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new UpdateUserCommand(id, request),
+                cancellationToken);
+
+            return result switch
+            {
+                UpdateUserResult.NotFound => NotFound(),
+                UpdateUserResult.EmailConflict => Conflict(
+                    "A user with this email already exists."
+                ),
+                UpdateUserResult.InvalidRole => BadRequest("Invalid role."),
+                UpdateUserResult.Updated => NoContent(),
+                _ => BadRequest()
+            };
+        }
+
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> Delete(
+            int id,
+            CancellationToken cancellationToken)
+        {
+            var result = await _mediator.Send(
+                new DeleteUserCommand(id),
+                cancellationToken);
+
+            return result switch
+            {
+                DeleteUserResult.NotFound => NotFound(),
+                DeleteUserResult.Conflict => Conflict(
+                    "This user cannot be deleted because they are linked to existing orders."
+                ),
+                DeleteUserResult.Deleted => NoContent(),
+                _ => BadRequest()
+            };
         }
     }
 }

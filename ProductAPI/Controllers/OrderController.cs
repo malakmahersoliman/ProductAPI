@@ -33,7 +33,7 @@ public class OrdersController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize(Roles = "SuperAdmin")]
+
     [HttpGet("{id}")]
     public async Task<IActionResult> GetById(int id)
     {
