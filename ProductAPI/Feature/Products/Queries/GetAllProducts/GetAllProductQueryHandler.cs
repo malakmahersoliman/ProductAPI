@@ -45,16 +45,18 @@ namespace ProductAPI.Feature.Products.Queries.GetAllProducts
             }
             if (filter.IsAvailable.HasValue)
             {
-                query = query.Where(p=> p.IsAvailable == filter.IsAvailable.Value);
+                query = filter.IsAvailable.Value
+                    ? query.Where(p => p.IsAvailable && p.Stock > 0)
+                    : query.Where(p => !p.IsAvailable || p.Stock == 0);
             }
-            if (!string.IsNullOrWhiteSpace((filter.StockStatus)))
+            if (!string.IsNullOrWhiteSpace(filter.StockStatus))
             {
-                var stockStatus = filter.StockStatus.Trim();
+                var stockStatus = filter.StockStatus.Trim().ToLowerInvariant();
                 query = stockStatus switch
                 {
-                    "instock" => query.Where(p => p.Stock > 0),
-                    "lowstock" => query.Where(p => p.Stock > 0 && p.Stock <= 5),
-                    "outofstock" => query.Where(p => p.Stock == 0),
+                    "instock" => query.Where(p => p.IsAvailable && p.Stock > 0),
+                    "lowstock" => query.Where(p => p.IsAvailable && p.Stock > 0 && p.Stock <= 4),
+                    "outofstock" => query.Where(p => !p.IsAvailable || p.Stock == 0),
                     _ => query
                 };
             }

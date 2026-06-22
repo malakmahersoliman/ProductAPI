@@ -127,6 +127,11 @@ public class CreateOrderCommandHandler
                 });
 
                 product.Stock -= item.Quantity;
+
+                if (product.Stock == 0)
+                {
+                    product.IsAvailable = false;
+                }
             }
 
             var payment = new Payment
