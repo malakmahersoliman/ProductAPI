@@ -30,7 +30,8 @@ public class GetProductByIdQueryHandler
                 CategoryName = p.Category.Name,
                 Price = p.Price,
                 Stock = p.Stock,
-                IsAvailable = p.IsAvailable
+                IsAvailable = p.IsAvailable,
+                ImagePath=p.ImagePath
             })
             .FirstOrDefaultAsync(cancellationToken);
     }

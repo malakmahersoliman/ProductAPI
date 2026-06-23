@@ -26,6 +26,7 @@ namespace ProductAPI.Domain
         [Required]
 
         public bool IsAvailable { get; set; } = true;
+        public string? ImagePath { get; set; }
 
         public ICollection<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
     }

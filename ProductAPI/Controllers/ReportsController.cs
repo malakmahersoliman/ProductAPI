@@ -1,7 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using ProductAPI.Feature.Reports.Queries.GetSalesReport;
+using ProductAPI.Feature.Reports.GetSalesReport.Queries;
+using ProductAPI.Feature.Reports.Pdf;
+using QuestPDF.Fluent;
 
 namespace ProductAPI.Controllers;
 
@@ -28,5 +30,27 @@ public class ReportsController : ControllerBase
         var result = await _mediator.Send(new GetSalesReportQuery(from, to));
 
         return Ok(result);
+    }
+    [HttpGet("sales/pdf")]
+    public async Task<IActionResult> DownloadSalesReportPdf(
+    [FromQuery] DateTime from,
+    [FromQuery] DateTime to)
+    {
+        if (from > to)
+            return BadRequest("From date cannot be after To date.");
+
+        var report = await _mediator.Send(
+            new GetSalesReportQuery(from, to));
+
+        var document = new SalesReportDocument(report);
+
+        var pdfBytes = document.GeneratePdf();
+
+        var fileName = $"sales-report-{from:yyyy-MM-dd}-to-{to:yyyy-MM-dd}.pdf";
+
+        return File(
+            pdfBytes,
+            "application/pdf",
+            fileName);
     }
 }

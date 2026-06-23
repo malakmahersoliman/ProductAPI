@@ -58,7 +58,9 @@ namespace ProductAPI.Feature.Products.Commands.CreateProduct
                 CategoryName = categoryName,
                 Price = product.Price,
                 Stock = product.Stock,
-                IsAvailable = product.IsAvailable
+                IsAvailable = product.IsAvailable,
+                ImagePath=product.ImagePath
+                
             };
         }
     }

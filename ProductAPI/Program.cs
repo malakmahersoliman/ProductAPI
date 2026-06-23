@@ -12,6 +12,8 @@ using ProductAPI.Services;
 using ProductAPI.Settings;
 using System.Text;
 using System.Text.Json.Serialization;
+using QuestPDF.Infrastructure;
+
 
 namespace ProductAPI
 {
@@ -19,7 +21,11 @@ namespace ProductAPI
     {
         public static void Main(string[] args)
         {
+            QuestPDF.Settings.License = LicenseType.Community;
+
             var builder = WebApplication.CreateBuilder(args);
+
+
 
 
 
@@ -181,6 +187,8 @@ namespace ProductAPI
             }
 
             app.UseHttpsRedirection();
+
+            app.UseStaticFiles();
 
             app.UseCors("AllowAngular");
 
